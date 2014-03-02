@@ -20,10 +20,19 @@ start() -> application:start(idna).
 stop() ->  application:stop(idna).
 
 to_ascii(Domain) ->
-    to_ascii(string:tokens(idna_unicode:downcase(Domain), "."), []).
+    case ets_lru:lookup(idna_lru, Domain) of
+        not_found ->
+            Res = to_ascii(string:tokens(idna_unicode:downcase(Domain), "."),
+                           []),
+            ets_lru:insert(idna_lru, Domain, Res),
+            Res;
+        {ok, Res} ->
+           Res
+    end.
 
 utf8_to_ascii(Domain) ->
     to_ascii(xmerl_ucs:from_utf8(Domain)).
+
 
 to_ascii([], Acc) ->
     lists:reverse(Acc);
