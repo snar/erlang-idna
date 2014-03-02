@@ -1,0 +1,7 @@
+ebin/
+priv/*.txt
+*.beam
+*.sw*
+deps
+.DS_Store
+erl_crash.dump

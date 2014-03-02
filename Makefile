@@ -1,11 +1,21 @@
-all: clean compile
+REBAR?=./rebar
+
+all: build
 
 clean:
-	@rm -rf ebin/*.beam
+	@$(REBAR) clean
 
-compile:
-	@test -d ebin || mkdir ebin
-	@erl -make
+distclean: clean
+	@rm -rf deps
 
-test: clean compile
-	@escript test.escript
+build:
+	@$(REBAR) compile
+
+deps:
+	@$(REBAR) get-deps
+
+test:
+	@./test.escript
+
+
+.PHONY: test deps
