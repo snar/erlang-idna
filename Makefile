@@ -17,5 +17,8 @@ deps:
 test:
 	@./test.escript
 
+dataupdate:
+	@./bootstrap.sh
+
 
 .PHONY: test deps

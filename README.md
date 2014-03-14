@@ -1,12 +1,8 @@
-erlang-idna
-===========
-
+# erlang-idna
 
 A pure Erlang IDNA implementation.
 
-
-Quick start
------------
+## Quick start
 
     $ make deps
     ...
@@ -21,9 +17,11 @@ Quick start
     3> idna:to_ascii(Domain).
     ...
 
+> Note: to update unicode data run the following command line:
 
-Useful references
------------------
+    $ make dataupdate
+
+## Useful references
 
 [RFC3490](http://www.ietf.org/rfc/rfc3490.txt) (IDNA)
 

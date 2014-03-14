@@ -1,5 +1,4 @@
 ebin/
-priv/*.txt
 *.beam
 *.sw*
 deps
