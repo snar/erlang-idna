@@ -21,6 +21,14 @@ A pure Erlang IDNA implementation.
 
     $ make dataupdate
 
+## Requirements
+
+erlang-dina depends on
+[ets_lru](https://github.com/cloudant/ets_lru.git) which should be
+fetched and built with rebar. Don't forget to include it in your
+applications for an OTP release.
+
+
 ## Useful references
 
 [RFC3490](http://www.ietf.org/rfc/rfc3490.txt) (IDNA)
