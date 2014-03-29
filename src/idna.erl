@@ -17,8 +17,7 @@
 %% helpers
 
 start() ->
-    application:load(idna),
-    ensure_deps_started(),
+    application:start(xmerl),
     application:start(idna).
 
 stop() ->
@@ -59,25 +58,8 @@ label_to_ascii(Label) ->
 
 %% @private
 %% start the application
-start(_StartType, _StartArgs) ->
-    ensure_deps_started(),
-    idna_sup:start_link().
+start(_StartType, _StartArgs) -> idna_sup:start_link().
 
 %% @private
 %% stop the application
 stop(_State) -> ok.
-
-
-ensure_deps_started() ->
-    {ok, Deps} = application:get_key(idna, applications),
-    true = lists:all(fun ensure_started/1, Deps).
-ensure_started(App) ->
-    case application:start(App) of
-        ok ->
-            true;
-        {error, {already_started, App}} ->
-            true;
-        Else ->
-            error_logger:error_msg("Couldn't start ~p: ~p", [App, Else]),
-            Else
-    end.
