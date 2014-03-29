@@ -16,8 +16,12 @@
 
 %% helpers
 
-start() -> application:start(idna).
-stop() ->  application:stop(idna).
+start() ->
+    application:start(xmerl),
+    application:start(idna).
+
+stop() ->
+    application:stop(idna).
 
 to_ascii(Domain) ->
     case ets_lru:lookup(idna_lru, Domain) of
