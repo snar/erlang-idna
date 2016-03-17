@@ -1,19 +1,18 @@
 -module(idna_unicode_data).
+
 -export([lookup/1]).
 -export([decomposition/1]).
 
 -include("idna_unicode_data.hrl").
 
-lookup("") -> false;
 lookup(Codepoint) ->
-	case lists:keyfind(Codepoint, 1, ?UNICODE_DATA) of
-		{_, A, B, C} -> {A, B, C};
+	case lists:keyfind(Codepoint, 1, ?BY_CODE) of
+		{CodePoint, Val} -> Val;
 		false -> false
 	end.
 
-decomposition("") -> false;
 decomposition(Key) ->
-	case lists:keyfind(Key, 3, ?UNICODE_DATA) of
-		{A, _, _, _} -> A;
+	case lists:keyfind(Key, 1, ?BY_KEY) of
+		{Key, Val} -> Val;
 		false -> false
 	end.
