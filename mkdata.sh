@@ -14,29 +14,32 @@ if ! test -n "CURLBIN"; then
     exit 1
 fi
 
-
+GEN_DIR=idna.d
 DATA_FILE=UnicodeData.txt
 DATA_URL=http://www.unicode.org/Public/UNIDATA/UnicodeData.txt
-DATA_OUT=src/idna_unicode_data1.erl
-DATA_OUT2=src/idna_unicode_data2.erl
+INCLUDE_FILE=$GEN_DIR/idna_unicode_data.hrl
+MODULE_SRC=$GEN_DIR/idna_unicode_data.erl
+
 # fetch data file
 
 if [ ! -e "$DATA_FILE" ]; then
     $CURL_BIN -o $DATA_FILE $DATA_URL
 fi
 
-cat <<EOF > $DATA_OUT
+mkdir -p $GEN_DIR
+cat <<EOF > $INCLUDE_FILE
 -define(BY_CODE, #{
 EOF
 cat $DATA_FILE \
     | awk 'BEGIN{FS=";"}{if($1!=""){ printf("\"%s\" => {\"%s\",\"%s\",\"%s\"}\n", $1, $4, $6, $14) }};' \
     | sort \
     | uniq -w 25 \
-    >> $DATA_OUT
-echo "})." >> $DATA_OUT
+    | awk '{print t $0;}; {t = ","} ' \
+    >> $INCLUDE_FILE
+echo "})." >> $INCLUDE_FILE
 
 
-cat <<EOF >> $DATA_OUT
+cat <<EOF >> $INCLUDE_FILE
 -define(BY_KEY, #{
 EOF
 cat $DATA_FILE \
@@ -44,5 +47,23 @@ cat $DATA_FILE \
     | sort \
     | uniq -w 25 \
     | awk '{print t $0;}; {t = ","} ' \
-    >> $DATA_OUT
-echo "})." >> $DATA_OUT
+    >> $INCLUDE_FILE
+echo "})." >> $INCLUDE_FILE
+
+cat <<EOF > $MODULE_SRC
+-module(idna_unicode_data).
+
+-export([lookup/1]).
+-export([decomposition/1]).
+
+-include("idna_unicode_data.hrl").
+
+lookup(Codepoint) ->
+	maps:get(Codepoint, ?BY_CODE, false).
+
+decomposition(Key) ->
+	maps:get(Key, ?BY_KEY, false).
+EOF
+
+mkdir -p priv
+erlc -I $INCLUDE_FILE -o priv/ $MODULE_SRC

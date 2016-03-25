@@ -1,5 +1,7 @@
 -module(idna_unicode).
 
+-on_load(init/0).
+
 -export([compose/1,
          decompose/1,
          downcase/1,
@@ -210,3 +212,15 @@ lookup(Codepoint, Fun) ->
         false -> {error, bad_codepoint};
         Props -> Fun(Props)
     end.
+
+init() ->
+    BinPath = filename:join(
+		case code:priv_dir(idna) of
+		    {error, bad_name} ->
+		        filename:join(filename:dirname(filename:dirname(code:which(?MODULE))), "priv");
+		    Dir ->
+		        Dir
+		end, "idna_unicode_data.beam"),
+    {ok, Bin} = file:read_file(BinPath),
+    {module, idna_unicode_data} = code:load_binary(idna_unicode_data, "idna_unicode_data.erl", Bin),
+    ok.
