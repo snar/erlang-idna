@@ -162,29 +162,18 @@ sort_canonical(Unicode, I, Length) ->
 combining_class(C) ->
     case lookup(C) of
         false -> 0;
-        Props ->
-            erlang:list_to_integer(element(?COMBINING_CLASS, Props))
+        Props -> element(?COMBINING_CLASS, Props)
     end.
 
 compat(C) ->
     lookup(C, fun(Props) ->
-                      case element(?DECOMPOSITION, Props) of
-                          [] -> undefined;
-                          Val ->
-                              Tokens = string:tokens(Val, " "),
-                              CodePoints = dehex(case hd(Val) of
-                                                     $< -> tl(Tokens);
-                                                     _ -> Tokens
-                                                 end),
-                              CodePoints
-                      end
+                      element(?DECOMPOSITION, Props)
               end).
 
 composition(A, B) ->
-    Key = lists:flatten([hex(A), " ", hex(B)]),
-    case idna_unicode_data:decomposition(Key) of
+    case idna_udata:k([A, B]) of
         false -> undefined;
-        Val -> erlang:list_to_integer(Val, 16)
+        Val -> Val
     end.
 
 
@@ -192,18 +181,12 @@ lowercase(C) ->
     lookup(C, fun(Props) ->
                 case element(?LOWERCASE_MAPPING, Props) of
                     [] -> C;
-                    Hex -> erlang:list_to_integer(Hex, 16)
+                    I -> I
                 end
         end).
 
-hex(Codepoint) ->
-    string:right(erlang:integer_to_list(Codepoint, 16), 4, $0).
-
-dehex(Strings) ->
-    [erlang:list_to_integer(String, 16) || String <- Strings].
-
 lookup(Codepoint) ->
-    idna_unicode_data:lookup(hex(Codepoint)).
+    idna_udata:l(Codepoint).
 
 lookup(Codepoint, Fun) ->
     case lookup(Codepoint) of
