@@ -79,7 +79,6 @@ process_file(Fd, Codes, Keys) ->
             end, lists:ukeysort(1, Codes)),
             file:write(Src, "l(_) -> false.\n"),
             lists:foreach(fun({K, C}) ->
-                io:format("key is ~p~n", [K]),
                 io:fwrite(Src, "k(~w) -> ~w;~n", [K, C])
             end, lists:ukeysort(1, Keys)),
             file:write(Src, "k(_) -> false.\n"),
@@ -94,7 +93,6 @@ main(_) ->
         false ->
             ok = fetch_datafile()
     end,
-
     {ok, Fd} = file:open(?UNICODE_DATA_FILE, [read]),
     process_file(Fd, [], []),
     file:close(Fd),
